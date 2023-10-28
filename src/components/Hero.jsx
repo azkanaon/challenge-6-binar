@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { getPopularMovies } from "../redux/actions/movieActions";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -16,66 +17,34 @@ const Hero = () => {
   const [currentMovie, setCurrentMovie] = useState([]);
   const [backdrop, setBackdrop] = useState([]);
   const [movieHero, setMovieHero] = useState([]);
+  const dispatch = useDispatch();
+  const { popular } = useSelector((state) => state.movie);
   // menghindari error ketika awal pencarian video,
   // belum tau cara yang benar buat solve kasus ini
-  const [getCurrentId, setGetCurrentId] = useState(268);
+  const [getCurrentId, setGetCurrentId] = useState(0);
   const [isOpen, setOpen] = useState(false);
   const handleChange = () => {
     setOpen(!isOpen);
   };
 
-  const [errors, setErrors] = useState({
-    isError: false,
-    message: null,
-  });
-  // mengambil 5 array pertama pada api, untuk ditampilkan sebagai hero
+  const [errors, setErrors] = useState({ isError: false, message: "" });
 
   useEffect(() => {
-    const get5PopularMovies = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/popular`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const { data } = response.data;
-        if (data.length > 0) {
-          // untuk mengeset background dan informasi terkait (judul, release_date, dll)
-          setCurrentMovie(data[0]);
-          // ambil id saat ini agar dapat melihat trailer
-          setGetCurrentId(data[0].id);
-          setBackdrop(`${imageUrlHD}${data[0].backdrop_path}`);
+    dispatch(getPopularMovies(setErrors, errors));
+  }, [dispatch]);
 
-          // pengambilan lima index pertama
-          const first5Movies = data.slice(0, 5);
-          setMovieHero([...first5Movies]);
-        }
-        setErrors({ ...errors, isError: false });
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrors({
-            ...errors,
-            isError: true,
-            message: error?.response?.data?.message || error?.message,
-          });
-          return;
-        }
-
-        alert(error?.message);
-        setErrors({
-          ...errors,
-          isError: true,
-          message: error?.message,
-        });
-      }
+  useEffect(() => {
+    const setAll = () => {
+      setMovieHero(popular.slice(0, 5));
+      setCurrentMovie(popular[0]);
+      setGetCurrentId(popular[0]?.id);
+      setBackdrop(`${imageUrlHD}${popular[0]?.backdrop_path}`);
     };
 
-    get5PopularMovies();
-  }, []);
+    if (popular && popular.length > 0) {
+      setAll(popular);
+    }
+  }, [popular, imageUrlHD]);
 
   // untuk handle perubahan background ketika di swipe
   const handleSlideChange = (swiper) => {
@@ -102,7 +71,7 @@ const Hero = () => {
       {movieHero.length === 0 && <Loader />}
       <div className="w-full  md:w-6/12 text-poppins text-white px-6 md:px-10 md:mt-0 h-[50vh] md:h-auto flex flex-col justify-center ">
         <h1 className="mt-20 md:mt-0 md:my-5 text-4xl md:text-6xl font-semibold h-[48px] md:h-auto overflow-auto md:overflow-visible">
-          {currentMovie.title ? currentMovie.title : ""}
+          {currentMovie?.title ? currentMovie.title : ""}
         </h1>
         <p className="py-1 md:mb-2 text-lg md:text-2xl font-semibold ">
           <span className="text-yellow-400 ">
@@ -110,25 +79,24 @@ const Hero = () => {
           </span>
           <span>
             &nbsp;
-            {currentMovie.vote_average
+            {currentMovie?.vote_average
               ? currentMovie.vote_average.toFixed(1)
               : "Unknown"}
           </span>
           &nbsp;|&nbsp;
           <span>
-            {currentMovie.release_date
+            {currentMovie?.release_date
               ? new Date(currentMovie.release_date).getFullYear()
               : ""}
           </span>
         </p>
         <p className="opacity-80 h-[20vh] md:h-auto overflow-auto">
-          {currentMovie.overview}
+          {currentMovie?.overview}
         </p>
         <ModalWatch
           id={getCurrentId ? getCurrentId : 0}
           isOpen={isOpen}
           close={handleChange}
-          className=""
         />
         <ButtonWatch click={handleChange} />
       </div>
@@ -152,13 +120,13 @@ const Hero = () => {
             className="mySwiper swiper-container"
           >
             {movieHero.map((movie) => (
-              <SwiperSlide key={movie.id} className="slider-2">
-                <Link to={`/movie/detail/${movie.id}`}>
+              <SwiperSlide key={movie?.id} className="slider-2">
+                <Link to={`/movie/detail/${movie?.id}`}>
                   <div>
                     <img
                       className="rounded-xl shadow-sm neon-slate hover:scale-105 duration-200"
-                      src={`${imageUrl}${movie.backdrop_path}`}
-                      alt={movie.title}
+                      src={`${imageUrl}${movie?.backdrop_path}`}
+                      alt={movie?.title}
                     />
                   </div>
                 </Link>
