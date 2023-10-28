@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { getPopularMovies } from "../../redux/actions/movieActions";
 
 import Card from "../../components/Card";
 import Navbar from "../../components/Navbar";
@@ -11,59 +12,21 @@ const MovieType = () => {
   const { type } = useParams();
   // tipe top rated direname agar tampilan terlihat lebih rapi
   const typeModifier = useState(type.toUpperCase());
-  const [movieList, setMovieList] = useState([]);
   const [errors, setErrors] = useState({
     isError: false,
     message: null,
   });
+  const dispatch = useDispatch();
+  const { popular } = useSelector((state) => state.movie);
 
   // ambil movie dengan tipe popular
   useEffect(() => {
-    const getPopularMovies = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${type}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const { data } = response.data;
-        if (data.length > 0) {
-          setMovieList(data);
-        }
-        setErrors({ ...errors, isError: false });
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrors({
-            ...errors,
-            isError: true,
-            message: error?.response?.data?.message || error?.message,
-          });
-          return;
-        }
-
-        alert(error?.message);
-        setErrors({
-          ...errors,
-          isError: true,
-          message: error?.message,
-        });
-      }
-    };
-
-    getPopularMovies();
-  }, []);
+    dispatch(getPopularMovies(setErrors, errors));
+  }, [dispatch]);
 
   return (
-    <div className="bg-gradient-to-tr from-black to-white/20">
-      {movieList.length === 0 && (
-        <div className="w-screen  h-[60vh]">
-          <Loader />
-        </div>
-      )}
+    <div className="bg-gradient-to-t from-black to-white/5">
+      {popular.length === 0 && <Loader />}
       <Navbar />
       <div className="font-poppins mx-auto pt-[100px] md:pt-[150px]  w-11/12 md:w-10/12 text-white pb-10">
         <div className="text-center pb-5 md:pb-10 ">
@@ -72,7 +35,7 @@ const MovieType = () => {
           </h2>
         </div>
         <div className="flex flex-wrap w-full">
-          {movieList.map((movie) => (
+          {popular.map((movie) => (
             <div
               key={movie.id}
               className="w-6/12 md:w-4/12 lg:w-[20%] box-border p-1 md:p-4"

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { getPopularMovies } from "../../redux/actions/movieActions";
 
 import Navbar from "../../components/Navbar";
 import Hero from "../../components/Hero";
@@ -8,6 +9,8 @@ import Footer from "../../components/Footer";
 import Loader from "../../components/Loader";
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const { popular } = useSelector((state) => state.movie);
   const [moviePopularList, setMoviePopularList] = useState([]);
   const [errors, setErrors] = useState({
     isError: false,
@@ -16,44 +19,15 @@ const Home = () => {
 
   // ambil movie dengan tipe popular
   useEffect(() => {
-    const getPopularMovies = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/popular`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const { data } = response.data;
-        if (data.length > 0) {
-          const first9Movies = data.slice(0, 9);
-          setMoviePopularList([...first9Movies]);
-        }
-        setErrors({ ...errors, isError: false });
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrors({
-            ...errors,
-            isError: true,
-            message: error?.response?.data?.message || error?.message,
-          });
-          return;
-        }
+    dispatch(getPopularMovies(setErrors, errors));
+  }, [dispatch]);
 
-        alert(error?.message);
-        setErrors({
-          ...errors,
-          isError: true,
-          message: error?.message,
-        });
-      }
-    };
+  useEffect(() => {
+    if (popular.length > 0) {
+      setMoviePopularList(popular.slice(0, 9));
+    }
+  }, [popular]);
 
-    getPopularMovies();
-  }, []);
   return (
     <div className="bg-gradient-to-b from-black/100 to-black/50 font-poppins">
       <Navbar />
