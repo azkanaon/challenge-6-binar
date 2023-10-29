@@ -5,9 +5,8 @@ const initialState = {
   popular: [],
   searchResult: [],
   getDetailData: [],
-  video:[],
-  user:{},
-  page:"",
+  video: [],
+  page: "",
 };
 
 // Define the slice, the slice is consist of initial state and the setter of the global state
@@ -27,9 +26,6 @@ const movieSlice = createSlice({
     setVideo: (state, action) => {
       state.video = action.payload;
     },
-    setUser: (state, action) => {
-      state.user = action.payload;
-    },
     setPage: (state, action) => {
       state.page = action.payload;
     },
@@ -37,8 +33,14 @@ const movieSlice = createSlice({
 });
 
 // Export the function to set the state
-export const { setPopular, setDetailMovie, setSearchResult, setGetDetailData,setVideo,setUser,setPage} =
-  movieSlice.actions;
+export const {
+  setPopular,
+  setDetailMovie,
+  setSearchResult,
+  setGetDetailData,
+  setVideo,
+  setPage,
+} = movieSlice.actions;
 
 // Export the global state, so the variable in the initialState will be available in any component
 export default movieSlice.reducer;

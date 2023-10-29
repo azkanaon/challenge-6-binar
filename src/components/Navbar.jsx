@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getMe } from "../redux/actions/movieActions";
+import { getMe } from "../redux/actions/authActions";
 
 const Navbar = () => {
-  const { user } = useSelector((state) => state.movie);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

@@ -4,10 +4,10 @@ import bg from "../../assets/image/bg-profile.jpg";
 import Typed from "typed.js";
 import Loader from "../../components/Loader";
 import { useDispatch, useSelector } from "react-redux";
-import { getMe } from "../../redux/actions/movieActions";
+import { getMe } from "../../redux/actions/authActions";
 
 const Profile = () => {
-  const { user } = useSelector((state) => state.movie);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const el = useRef(null);
   useEffect(() => {
