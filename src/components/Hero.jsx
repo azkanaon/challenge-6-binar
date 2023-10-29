@@ -23,7 +23,9 @@ const Hero = () => {
   // belum tau cara yang benar buat solve kasus ini
   const [getCurrentId, setGetCurrentId] = useState(0);
   const [isOpen, setOpen] = useState(false);
-  const handleChange = () => {
+  const [page, setPage] = useState("");
+  const handleChange = (isi) => {
+    setPage(isi);
     setOpen(!isOpen);
   };
 
@@ -96,9 +98,10 @@ const Hero = () => {
         <ModalWatch
           id={getCurrentId ? getCurrentId : 0}
           isOpen={isOpen}
-          close={handleChange}
+          close={() => handleChange(null)}
+          page={page}
         />
-        <ButtonWatch click={handleChange} />
+        <ButtonWatch click={() => handleChange("hero")} />
       </div>
       <div className="w-full md:w-6/12 flex justify-center items-center">
         <div className="w-11/12 rounded-2xl shadow-2xl neon-zinc backdrop-blur-sm bg-transparent">

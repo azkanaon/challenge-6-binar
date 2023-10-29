@@ -1,5 +1,11 @@
 import axios from "axios";
-import { setPopular, setSearchResult } from "../reducers/movieReducer";
+import {
+  setPopular,
+  setSearchResult,
+  setGetDetailData,
+  setVideo,
+  setUser,
+} from "../reducers/movieReducer";
 
 export const getPopularMovies =
   (setErrors, errors) => async (dispatch, getState) => {
@@ -75,3 +81,116 @@ export const getSearchMovie =
       });
     }
   };
+
+export const getDetailMovie =
+  (errors, setErrors, id) => async (dispatch, getState) => {
+    try {
+      const token = localStorage.getItem("token");
+      dispatch(setGetDetailData([]));
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+        );
+        const { data } = response.data;
+        
+        if (id) {
+          dispatch(setGetDetailData(data));
+        }
+
+      setErrors({ ...errors, isError: false });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrors({
+          ...errors,
+          isError: true,
+          message: error?.response?.data?.message || error?.message,
+        });
+        return;
+      }
+
+      alert(error?.message);
+      setErrors({
+        ...errors,
+        isError: true,
+        message: error?.message,
+      });
+    }
+  };
+
+export const getVideo =
+  (errors, setErrors, id, page) => async (dispatch, getState) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const { data } = response.data;
+
+      if (page == "detail" || page == "hero") {
+        dispatch(setVideo(data.videos));
+      }
+      if (page == null) {
+        dispatch(setVideo([]));
+      }
+      setErrors({ ...errors, isError: false });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrors({
+          ...errors,
+          isError: true,
+          message: error?.response?.data?.message || error?.message,
+        });
+        return;
+      }
+
+      alert(error?.message);
+      setErrors({
+        ...errors,
+        isError: true,
+        message: error?.message,
+      });
+    }
+  };
+
+export const getMe = () => async (dispatch, getState) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const { data } = response.data;
+
+    // Set the user state from API data
+    dispatch(setUser(data));
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // If token is not valid
+      if (error.response.status === 401) {
+        localStorage.removeItem("token");
+        return;
+      }
+
+      alert(error?.response?.data?.message);
+      return;
+    }
+
+    alert(error?.message);
+  }
+};
