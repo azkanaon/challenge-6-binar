@@ -1,5 +1,10 @@
 import axios from "axios";
-import { setPopular, setSearchResult } from "../reducers/movieReducer";
+import {
+  setPopular,
+  setSearchResult,
+  setGetDetailData,
+  setVideo,
+} from "../reducers/movieReducer";
 
 export const getPopularMovies =
   (setErrors, errors) => async (dispatch, getState) => {
@@ -56,6 +61,85 @@ export const getSearchMovie =
       );
       const { data } = response.data;
       dispatch(setSearchResult(data));
+      setErrors({ ...errors, isError: false });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrors({
+          ...errors,
+          isError: true,
+          message: error?.response?.data?.message || error?.message,
+        });
+        return;
+      }
+
+      alert(error?.message);
+      setErrors({
+        ...errors,
+        isError: true,
+        message: error?.message,
+      });
+    }
+  };
+
+export const getDetailMovie =
+  (errors, setErrors, id) => async (dispatch, getState) => {
+    try {
+      const token = localStorage.getItem("token");
+      dispatch(setGetDetailData([]));
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+        );
+        const { data } = response.data;
+        
+        if (id) {
+          dispatch(setGetDetailData(data));
+        }
+
+      setErrors({ ...errors, isError: false });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setErrors({
+          ...errors,
+          isError: true,
+          message: error?.response?.data?.message || error?.message,
+        });
+        return;
+      }
+
+      alert(error?.message);
+      setErrors({
+        ...errors,
+        isError: true,
+        message: error?.message,
+      });
+    }
+  };
+
+export const getVideo =
+  (errors, setErrors, id, page) => async (dispatch, getState) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const { data } = response.data;
+
+      if (page == "detail" || page == "hero") {
+        dispatch(setVideo(data.videos));
+      }
+      if (page == null) {
+        dispatch(setVideo([]));
+      }
       setErrors({ ...errors, isError: false });
     } catch (error) {
       if (axios.isAxiosError(error)) {

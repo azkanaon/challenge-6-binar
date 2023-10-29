@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ModalVideo from "react-modal-video";
 import "react-modal-video/scss/modal-video.scss";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { getVideo } from "../redux/actions/movieActions";
 
-const ModalWatch = ({ id, close, isOpen }) => {
-  const [video, setVideo] = useState([]);
+const ModalWatch = ({ id, close, isOpen ,page}) => {
+  const { video } = useSelector((state) => state.movie);
+  const dispatch = useDispatch();
   const [errors, setErrors] = useState({
     isError: false,
     message: null,
@@ -14,44 +16,8 @@ const ModalWatch = ({ id, close, isOpen }) => {
 
   // ambil video
   useEffect(() => {
-    const getVideo = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const { data } = response.data;
-
-        if (data.videos.length > 0) {
-          setVideo(data.videos);
-        }
-        setErrors({ ...errors, isError: false });
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrors({
-            ...errors,
-            isError: true,
-            message: error?.response?.data?.message || error?.message,
-          });
-          return;
-        }
-
-        alert(error?.message);
-        setErrors({
-          ...errors,
-          isError: true,
-          message: error?.message,
-        });
-      }
-    };
-
-    getVideo();
-  }, [id]);
+    dispatch(getVideo(errors, setErrors, id, page));
+  }, [id, page]);
 
   return (
     <div>
@@ -71,6 +37,7 @@ ModalWatch.propTypes = {
   id: PropTypes.number,
   close: PropTypes.func,
   isOpen: PropTypes.bool,
+  page: PropTypes.string,
 };
 
 export default ModalWatch;

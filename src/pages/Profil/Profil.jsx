@@ -1,49 +1,17 @@
-import axios from "axios";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Navbar from "../../components/Navbar";
 import bg from "../../assets/image/bg-profile.jpg";
 import Typed from "typed.js";
 import Loader from "../../components/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { getMe } from "../../redux/actions/authActions";
 
 const Profile = () => {
-  const [user, setUser] = useState({});
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const el = useRef(null);
   useEffect(() => {
-    const getMe = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const { data } = response.data;
-
-        // Set the user state from API data
-        setUser(data);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          // If token is not valid
-          if (error.response.status === 401) {
-            localStorage.removeItem("token");
-            return;
-          }
-
-          alert(error?.response?.data?.message);
-          return;
-        }
-
-        alert(error?.message);
-      }
-    };
-
-    getMe();
+    dispatch(getMe());
 
     const typed = new Typed(el.current, {
       strings: [`Selamat datang di Halaman Profile`], // Strings to display

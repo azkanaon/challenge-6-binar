@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { getMe } from "../redux/actions/authActions";
 
 const Navbar = () => {
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [changeColor, setChangeColor] = useState(false);
   const [result, setResult] = useState("");
-  const [user, setUser] = useState(null);
+
   // inputan dibawa ke search page
   const goToResultSearch = (e) => {
     e.preventDefault();
@@ -37,41 +40,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const getMe = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const { data } = response.data;
-
-        // Set the user state from API data
-        setUser(data);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          // If token is not valid
-          if (error.response.status === 401) {
-            localStorage.removeItem("token");
-            return;
-          }
-
-          alert(error?.response?.data?.message);
-          return;
-        }
-
-        alert(error?.message);
-      }
-    };
-
-    getMe();
+    dispatch(getMe());
   }, []);
 
   return (

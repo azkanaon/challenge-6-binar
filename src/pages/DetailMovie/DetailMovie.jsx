@@ -1,21 +1,26 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 import Navbar from "../../components/Navbar";
 import ButtonWatch from "../../components/ButtonWatch";
 import ModalWatch from "../../components/ModalWatch";
 import Footer from "../../components/Footer";
 import Loader from "../../components/Loader";
+import { useDispatch, useSelector } from "react-redux";
+import { getDetailMovie } from "../../redux/actions/movieActions";
 
 const DetailMovie = () => {
-  const [getDetailData, setGetDetailData] = useState([]);
+  const { getDetailData } = useSelector((state) => state.movie);
+  const dispatch = useDispatch();
+
   const imageUrlHD = import.meta.env.VITE_REACT_W780IMAGE;
   const imageUrl = import.meta.env.VITE_REACT_W500IMAGE;
   const { id } = useParams();
+  const [page, setPage] = useState("");
   // pengaturan untuk modal di page detail
   const [isOpen, setOpen] = useState(false);
-  const handleChange = () => {
+  const handleChange = (isi) => {
+    setPage(isi);
     setOpen(!isOpen);
   };
   const [errors, setErrors] = useState({
@@ -25,42 +30,9 @@ const DetailMovie = () => {
 
   // ambil movie dengan tipe popular
   useEffect(() => {
-    const getDetailMovie = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const { data } = response.data;
-        if (data) {
-          setGetDetailData(data);
-        }
-        setErrors({ ...errors, isError: false });
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          setErrors({
-            ...errors,
-            isError: true,
-            message: error?.response?.data?.message || error?.message,
-          });
-          return;
-        }
-
-        alert(error?.message);
-        setErrors({
-          ...errors,
-          isError: true,
-          message: error?.message,
-        });
-      }
-    };
-
-    getDetailMovie();
+    if (id) {
+       dispatch(getDetailMovie(errors, setErrors, id));
+    }
   }, [id]);
   return (
     <div className="font-poppins">
@@ -118,9 +90,10 @@ const DetailMovie = () => {
             <ModalWatch
               id={getDetailData.id ? getDetailData.id : 0}
               isOpen={isOpen}
-              close={handleChange}
+              close={() => handleChange(null)}
+              page={page}
             />
-            <ButtonWatch click={handleChange} />
+            <ButtonWatch click={() => handleChange("detail")} />
           </div>
         </div>
       </div>
