@@ -31,7 +31,7 @@ const DetailMovie = () => {
   // ambil movie dengan tipe popular
   useEffect(() => {
     if (id) {
-       dispatch(getDetailMovie(errors, setErrors, id));
+      dispatch(getDetailMovie(errors, setErrors, id));
     }
   }, [id]);
   return (
