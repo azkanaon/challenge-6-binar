@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getMe } from "../redux/actions/authActions";
+import { getMe, logout } from "../redux/actions/authActions";
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
@@ -29,14 +29,14 @@ const Navbar = () => {
     window.addEventListener("scroll", changeBackgroundColor);
   }, []);
 
-  const logout = (event) => {
+  const onLogout = (event) => {
     event.preventDefault();
 
-    localStorage.removeItem("token");
+    dispatch(logout());
 
     // Redirect to home or reload the home
     // This is temporary solution, the better solution is using redux
-    window.location.replace("/login");
+    navigate("/login");
   };
 
   useEffect(() => {
@@ -106,7 +106,7 @@ const Navbar = () => {
                 </NavLink>
                 <button
                   className="mx-3 px-4  hover:underline text-white hover:scale-105 hover:translate-y-[-2px] font-semibold tracking-widest duration-200 shadow-text"
-                  onClick={logout}
+                  onClick={onLogout}
                 >
                   Logout
                 </button>
