@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function Register() {
+const Register = () => {
   const [email, setEmail] = useState("");
   const [lName, setLName] = useState("");
   const [fName, setFName] = useState("");
@@ -165,6 +165,6 @@ function Register() {
       </div>
     </div>
   );
-}
+};
 
 export default Register;

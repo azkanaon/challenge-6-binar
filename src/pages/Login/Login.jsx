@@ -1,39 +1,29 @@
 import { useState } from "react";
-import axios from "axios";
 import GoogleLogin from "../../components/GoogleLogin";
 import bg from "../../assets/image/bg-login.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/actions/authActions";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const login = async (event) => {
+
+  const onlogin = async (event) => {
     event.preventDefault();
+
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/login`,
-        {
-          email,
-          password,
-        }
-      );
-      const { data } = response.data;
-      const { token } = data;
-
-      // save our token
-      localStorage.setItem("token", token);
-
-      // go to home page
-      window.location.replace("/");
+      dispatch(login(email, password, navigate));
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error?.response?.data?.message);
-        return;
+      if (error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error(error.message);
       }
-
-      toast.error(error?.message);
     }
   };
 
@@ -56,7 +46,7 @@ const Login = () => {
             </h1>
           </div>
           <div className="w-full">
-            <form onSubmit={login} className="flex flex-col  items-center">
+            <form onSubmit={onlogin} className="flex flex-col  items-center">
               <div className="flex flex-col w-8/12 text-white">
                 <label className="font-semibold mb-2" htmlFor="#id">
                   Email
