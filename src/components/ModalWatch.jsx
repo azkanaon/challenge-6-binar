@@ -6,7 +6,7 @@ import "react-modal-video/scss/modal-video.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { getVideo } from "../redux/actions/movieActions";
 
-const ModalWatch = ({ id, close, isOpen ,page}) => {
+const ModalWatch = ({ id, close, isOpen, page }) => {
   const { video } = useSelector((state) => state.movie);
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({

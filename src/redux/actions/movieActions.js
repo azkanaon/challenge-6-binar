@@ -9,8 +9,7 @@ import {
 export const getPopularMovies =
   (setErrors, errors) => async (dispatch, getState) => {
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6IkZhaG1pIEFsZmFyZXphIiwiZW1haWwiOiJmYWxmYXJlemExQGJpbmFyYWNhZGVteS5vcmciLCJpYXQiOjE2OTg0NTg0MTB9.ypFdXQffU1K5hljbOFMr48Vt5PZqFvpXSfzhZDIrEls";
+      const { token } = getState().auth;
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/popular`,
         {
@@ -47,8 +46,7 @@ export const getPopularMovies =
 export const getSearchMovie =
   (query, setErrors, errors) => async (dispatch, getState) => {
     try {
-      const token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6IkZhaG1pIEFsZmFyZXphIiwiZW1haWwiOiJmYWxmYXJlemExQGJpbmFyYWNhZGVteS5vcmciLCJpYXQiOjE2OTg0NTg0MTB9.ypFdXQffU1K5hljbOFMr48Vt5PZqFvpXSfzhZDIrEls";
+      const { token } = getState().auth;
       const response = await axios.get(
         `${
           import.meta.env.VITE_REACT_API_ADDRESS
@@ -84,7 +82,7 @@ export const getSearchMovie =
 export const getDetailMovie =
   (errors, setErrors, id) => async (dispatch, getState) => {
     try {
-      const token = localStorage.getItem("token");
+      const { token } = getState().auth;
       dispatch(setGetDetailData([]));
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
@@ -93,12 +91,12 @@ export const getDetailMovie =
             Authorization: `Bearer ${token}`,
           },
         }
-        );
-        const { data } = response.data;
-        
-        if (id) {
-          dispatch(setGetDetailData(data));
-        }
+      );
+      const { data } = response.data;
+
+      if (id) {
+        dispatch(setGetDetailData(data));
+      }
 
       setErrors({ ...errors, isError: false });
     } catch (error) {
@@ -123,7 +121,7 @@ export const getDetailMovie =
 export const getVideo =
   (errors, setErrors, id, page) => async (dispatch, getState) => {
     try {
-      const token = localStorage.getItem("token");
+      const { token } = getState().auth;
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_API_ADDRESS}/movie/${id}`,
         {
