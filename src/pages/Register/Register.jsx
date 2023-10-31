@@ -1,12 +1,15 @@
 import { useState } from "react";
 import bg from "../../assets/image/bg-login.jpg";
-import axios from "axios";
+import { useDispatch } from "react-redux";
 import backLogo from "../../assets/image/backLogo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { register } from "../../redux/actions/authActions";
 
 const Register = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [lName, setLName] = useState("");
   const [fName, setFName] = useState("");
@@ -14,44 +17,20 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState();
 
-  const confirmPass = (event) => {
+  const registerAccount = async (event) => {
     event.preventDefault();
-    const confirmPassword = event.target.value;
-    setConfirmPassword(confirmPassword);
-    if (password != confirmPassword) {
-      setErrors("confirm password should be match with password");
-    } else {
-      setErrors("");
+
+    if (!fName || !lName || !email || !password) {
+      toast.error("First name,lastname,email and password  must be filled in");
+      return;
     }
-  };
 
-  const register = async (event) => {
-    event.preventDefault();
-    if (password != confirmPassword) {
-      setErrors("confirm password should be match with password");
-      toast.warn(errors);
-    } else {
-      try {
-        const fullname = `${fName} ${lName}`;
-        await axios.post(
-          `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/register`,
-          {
-            email: email,
-            name: fullname,
-            password: password,
-          }
-        );
-
-        window.location.replace("/login");
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          toast.warn(error?.response?.data?.message);
-          return;
-        }
-
-        toast.warn(error?.message);
-      }
+    if (password !== confirmPassword) {
+      toast.error("confirm password should be match with password");
+      return;
     }
+    dispatch(register(email, `${fName} ${lName}`, password, confirmPassword));
+    navigate("/");
   };
   return (
     <div
@@ -91,7 +70,10 @@ const Register = () => {
           </h1>
         </div>
         <div className="w-full">
-          <form onSubmit={register} className="flex flex-col  items-center">
+          <form
+            onSubmit={registerAccount}
+            className="flex flex-col  items-center"
+          >
             <div className="flex flex-col w-8/12 text-white">
               <label className="font-semibold mb-2" htmlFor="#id">
                 First Name
@@ -146,7 +128,7 @@ const Register = () => {
                     type="password"
                     className="border-2 py-1 px-2 rounded-md text-black"
                     value={confirmPassword}
-                    onChange={(event) => confirmPass(event)}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
                   />
                 </>
               )}
