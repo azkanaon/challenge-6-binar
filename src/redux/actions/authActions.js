@@ -7,7 +7,7 @@ export const getMe =
   (navigate, navigatePathSuccess, navigatePathError) =>
   async (dispatch, getState) => {
     try {
-      let { token } = getState().auth;
+      const { token } = getState().auth;
 
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/me`,
@@ -27,44 +27,63 @@ export const getMe =
       if (axios.isAxiosError(error)) {
         // If token is not valid
         if (error.response.status === 401) {
-          localStorage.removeItem("token");
+          logout();
           if (navigatePathError) navigate(navigatePathError);
           return;
         }
 
-        alert(error?.response?.data?.message);
+        toast.error(error?.response?.data?.message);
         return;
       }
 
-      alert(error?.message);
+      toast.error(error?.message);
     }
   };
 
-export const register = (email, name, password) => async (dispatch) => {
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/register`,
-      {
-        email,
-        name,
-        password,
+export const register =
+  (
+    email,
+    fullname,
+    password,
+    confirmPassword,
+    setErrors,
+    errors,
+    navigate,
+    navigateSuccess,
+    navigateError
+  ) =>
+  async (dispatch) => {
+    if (password != confirmPassword) {
+      setErrors("confirm password should be match with password");
+      if (!errors) {
+        toast.error("confirm password should be match with password");
       }
-    );
+      toast.error(errors);
+    } else {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_REACT_API_ADDRESS}/auth/register`,
+          {
+            email: email,
+            name: fullname,
+            password: password,
+          }
+        );
+        const { data } = response.data;
+        const { token } = data;
+        dispatch(setToken(token));
+        if (navigateSuccess) navigate(navigateSuccess);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          toast.error(error?.response?.data?.message);
+          if (navigateError) navigate(navigateError);
+          return;
+        }
 
-    const { data } = response.data;
-    const { token } = data;
-    dispatch(setToken(token));
-
-    toast.success("Registrasi Berhasil. Silahkan Login!");
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      toast.error(error.response.data.message || "Registrasi Gagal");
-      return;
+        toast(error?.message);
+      }
     }
-
-    toast.error(error.message || "Terjadi Kesalahan");
-  }
-};
+  };
 
 export const registerLoginWithGoogleAction =
   (accessToken, navigate) => async (dispatch) => {
