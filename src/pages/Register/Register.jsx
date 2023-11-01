@@ -3,7 +3,7 @@ import bg from "../../assets/image/bg-login.jpg";
 import { useDispatch } from "react-redux";
 import backLogo from "../../assets/image/backLogo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { register } from "../../redux/actions/authActions";
 
@@ -16,21 +16,21 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState();
-
   const registerAccount = async (event) => {
     event.preventDefault();
-
-    if (!fName || !lName || !email || !password) {
-      toast.error("First name,lastname,email and password  must be filled in");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error("confirm password should be match with password");
-      return;
-    }
-    dispatch(register(email, `${fName} ${lName}`, password, confirmPassword));
-    navigate("/");
+    dispatch(
+      register(
+        email,
+        `${fName} ${lName}`,
+        password,
+        confirmPassword,
+        setErrors,
+        errors,
+        navigate,
+        "/",
+        null
+      )
+    );
   };
   return (
     <div
@@ -84,6 +84,7 @@ const Register = () => {
                 placeholder="Enter First Name"
                 value={fName}
                 onChange={(event) => setFName(event.target.value)}
+                required
               />
               <label className="font-semibold mb-2" htmlFor="#id">
                 Last Name
@@ -132,11 +133,15 @@ const Register = () => {
                   />
                 </>
               )}
-              {confirmPassword && <label className="mb-3 my-2">{errors}</label>}
+              {confirmPassword !== password && (
+                <label className="py-1 font-semibold text-red-500">
+                  confirm password should be match with password
+                </label>
+              )}
             </div>
             <button
               type="submit"
-              className="mt-5 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-yellow-600 w-8/12 h-8 rounded-xl font-semibold text-white hover:bg-violet-900 hover:translate-y-[-3px]  duration-300"
+              className={` mt-6 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-yellow-600 w-8/12 rounded-xl font-semibold tracking-widest text-white hover:bg-violet-900 hover:translate-y-[-3px] duration-300 py-[6px]`}
             >
               {" "}
               Register{" "}
