@@ -108,7 +108,7 @@ const Navbar = () => {
                   className="mx-3 px-4  hover:underline text-white hover:scale-105 hover:translate-y-[-2px] font-semibold tracking-widest duration-200 shadow-text"
                   onClick={onLogout}
                 >
-                  Logout
+                  Logoutss
                 </button>
               </div>
             ) : (
