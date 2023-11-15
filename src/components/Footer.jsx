@@ -13,7 +13,7 @@ const Footer = () => {
           </span>
         </Link>
       </div>
-      <h3 className="text-white pt-5">Copyright by Ajkaa, Kevin, Fatwa</h3>
+      <h3 className="text-white pt-5">Copyright by Ajkaa, Kevvin, Fatwa</h3>
     </div>
   );
 };
